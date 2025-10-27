@@ -1,7 +1,7 @@
 {
   "phases": {
     "setup": {
-      "aptPkgs": ["python3", "build-essential"]
+      "aptPkgs": ["python3", "build-essential", "libudev-dev", "libusb-1.0-0-dev", "pkg-config"]
     },
     "install": {
       "cmds": ["npm install --production=false"]
