@@ -74,7 +74,7 @@ class ShipmentService {
     }
 
     // Add GROUP BY
-    query += ` GROUP BY s.id, u.first_name, u.last_name`;
+    query += ` GROUP BY s.id, u.id`;
 
     // Count total
     const countQuery = `
