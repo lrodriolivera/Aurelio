@@ -14,7 +14,6 @@ import logger from '../utils/logger';
  */
 export const track = async (req: Request, res: Response) => {
   try {
-    console.log('[TRACKING DEBUG] Request received for:', req.params.trackingNumber);
     const { trackingNumber } = req.params;
 
     if (!trackingNumber) {
@@ -41,15 +40,12 @@ export const track = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (error) {
-    console.log('[TRACKING DEBUG] Error caught:', error);
     if (error instanceof ApiError) {
-      console.log('[TRACKING DEBUG] ApiError:', error.statusCode, error.message);
       return res.status(error.statusCode).json({
         success: false,
         error: error.message,
       });
     }
-    console.log('[TRACKING DEBUG] Generic error:', error);
     logger.error(`Error tracking: ${error}`);
     return res.status(500).json({
       success: false,
