@@ -1,0 +1,52 @@
+{
+  "name": "transport-frontend",
+  "version": "1.0.0",
+  "description": "Frontend para Sistema de Gestión de Transporte de Carga",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
+  },
+  "dependencies": {
+    "@headlessui/react": "^2.2.9",
+    "@hookform/resolvers": "^5.2.2",
+    "@tanstack/react-query": "^5.17.9",
+    "@zxing/browser": "^0.1.5",
+    "axios": "^1.6.5",
+    "chart.js": "^4.5.1",
+    "clsx": "^2.1.0",
+    "date-fns": "^3.0.6",
+    "lucide-react": "^0.309.0",
+    "qrcode.react": "^3.1.0",
+    "react": "^18.2.0",
+    "react-chartjs-2": "^5.3.0",
+    "react-dom": "^18.2.0",
+    "react-hook-form": "^7.65.0",
+    "react-hot-toast": "^2.4.1",
+    "react-router-dom": "^6.21.1",
+    "react-signature-canvas": "^1.0.6",
+    "react-to-print": "^3.2.0",
+    "recharts": "^3.3.0",
+    "socket.io-client": "^4.6.1",
+    "zod": "^3.22.4",
+    "zustand": "^4.4.7"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.48",
+    "@types/react-dom": "^18.2.18",
+    "@typescript-eslint/eslint-plugin": "^6.18.1",
+    "@typescript-eslint/parser": "^6.18.1",
+    "@vitejs/plugin-react": "^4.2.1",
+    "autoprefixer": "^10.4.16",
+    "eslint": "^8.56.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.5",
+    "postcss": "^8.4.33",
+    "tailwindcss": "^3.4.0",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.10",
+    "vite-plugin-pwa": "^0.17.4"
+  }
+}

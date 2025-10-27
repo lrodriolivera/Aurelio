@@ -1,0 +1,27 @@
+# =========================================
+# Backend Environment Variables
+# Copy these to Railway environment variables
+# =========================================
+
+# Server Configuration
+NODE_ENV=production
+PORT=3000
+
+# Database (Railway will provide this automatically when you add PostgreSQL)
+DATABASE_URL=postgresql://user:password@host:port/database
+
+# JWT Secret (Generate a random string - IMPORTANT: Change this!)
+JWT_SECRET=your-super-secret-jwt-key-change-this-in-production-use-a-long-random-string
+
+# CORS (Frontend URL from Vercel - will be set after deploying frontend)
+CORS_ORIGIN=https://your-app.vercel.app
+
+# Email Configuration (Optional - for notifications)
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your-email@gmail.com
+SMTP_PASSWORD=your-app-password
+SMTP_FROM=noreply@yourdomain.com
+
+# Redis (Optional - for caching, not required for now)
+# REDIS_URL=redis://default:password@host:port
