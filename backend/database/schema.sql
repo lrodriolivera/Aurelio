@@ -17,9 +17,19 @@ CREATE TABLE IF NOT EXISTS users (
     last_name VARCHAR(100) NOT NULL,
     role VARCHAR(50) NOT NULL CHECK (role IN ('admin', 'operator', 'driver')),
     is_active BOOLEAN DEFAULT true,
+    last_login TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Add last_login column to existing tables (idempotent)
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name = 'users' AND column_name = 'last_login') THEN
+        ALTER TABLE users ADD COLUMN last_login TIMESTAMP;
+    END IF;
+END $$;
 
 -- =========================================
 -- CUSTOMERS TABLE
