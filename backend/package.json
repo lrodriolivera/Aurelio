@@ -6,8 +6,10 @@
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "tsc -p tsconfig.prod.json",
-    "start": "node database/migrate.js && node dist/server.js",
+    "start": "node database/migrate-fresh.js && node dist/server.js",
+    "start:safe": "node database/migrate.js && node dist/server.js",
     "migrate": "node database/migrate.js",
+    "migrate:fresh": "node database/migrate-fresh.js",
     "test": "jest",
     "lint": "eslint src --ext .ts",
     "format": "prettier --write \"src/**/*.ts\""
