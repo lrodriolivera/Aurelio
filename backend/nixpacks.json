@@ -1,0 +1,16 @@
+{
+  "phases": {
+    "setup": {
+      "aptPkgs": ["python3", "build-essential"]
+    },
+    "install": {
+      "cmds": ["npm install --production=false"]
+    },
+    "build": {
+      "cmds": ["npm run build"]
+    }
+  },
+  "start": {
+    "cmd": "npm run start"
+  }
+}
