@@ -21,21 +21,37 @@ async function runMigration() {
     await client.connect();
     console.log('✅ Connected to database');
 
-    // Read and execute schema.sql
-    console.log('📋 Running schema.sql...');
-    const schemaSQL = fs.readFileSync(path.join(__dirname, 'schema.sql'), 'utf8');
-    await client.query(schemaSQL);
-    console.log('✅ Schema created successfully');
+    // Check if tables already exist
+    const checkResult = await client.query(`
+      SELECT COUNT(*) as count
+      FROM information_schema.tables
+      WHERE table_schema = 'public'
+      AND table_name = 'users'
+    `);
 
-    // Read and execute seed.sql
-    console.log('🌱 Running seed.sql...');
-    const seedSQL = fs.readFileSync(path.join(__dirname, 'seed.sql'), 'utf8');
-    await client.query(seedSQL);
-    console.log('✅ Seed data inserted successfully');
+    const tablesExist = parseInt(checkResult.rows[0].count) > 0;
+
+    if (tablesExist) {
+      console.log('⚠️  Tables already exist, skipping schema creation');
+      console.log('ℹ️  To recreate schema, manually drop tables first');
+    } else {
+      // Read and execute schema.sql
+      console.log('📋 Running schema.sql...');
+      const schemaSQL = fs.readFileSync(path.join(__dirname, 'schema.sql'), 'utf8');
+      await client.query(schemaSQL);
+      console.log('✅ Schema created successfully');
+
+      // Read and execute seed.sql
+      console.log('🌱 Running seed.sql...');
+      const seedSQL = fs.readFileSync(path.join(__dirname, 'seed.sql'), 'utf8');
+      await client.query(seedSQL);
+      console.log('✅ Seed data inserted successfully');
+    }
 
     console.log('🎉 Migration completed successfully!');
   } catch (error) {
     console.error('❌ Migration failed:', error);
+    console.error('Full error:', error);
     throw error;
   } finally {
     await client.end();
