@@ -142,7 +142,17 @@ class ShipmentService {
     // Get packages in shipment grouped by order
     const packagesResult = await database.query(
       `SELECT
-        p.*,
+        p.id,
+        p.package_number,
+        p.description,
+        p.weight,
+        p.length,
+        p.width,
+        p.height,
+        p.current_status,
+        p.label_printed,
+        p.label_printed_at,
+        p.created_at,
         o.id as order_id,
         o.order_number,
         o.total_weight as order_total_weight,
