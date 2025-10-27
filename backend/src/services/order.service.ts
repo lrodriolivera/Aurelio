@@ -32,7 +32,7 @@ class OrderService {
         u.first_name || ' ' || u.last_name as created_by_name
       FROM orders o
       JOIN customers c ON o.customer_id = c.id
-      JOIN users u ON o.created_by = u.id
+      LEFT JOIN users u ON o.created_by = u.id
       WHERE 1=1
     `;
 
@@ -90,7 +90,7 @@ class OrderService {
         u.first_name || ' ' || u.last_name as created_by_name
       FROM orders o
       JOIN customers c ON o.customer_id = c.id
-      JOIN users u ON o.created_by = u.id
+      LEFT JOIN users u ON o.created_by = u.id
       WHERE o.id = $1`,
       [id]
     );
