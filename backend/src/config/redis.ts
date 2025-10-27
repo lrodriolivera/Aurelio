@@ -13,6 +13,14 @@ class RedisClient {
   private isConnected: boolean = false;
 
   private constructor() {
+    // Only create client if Redis URL is provided
+    if (!config.redis.url || config.redis.url === 'redis://localhost:6379') {
+      logger.warn('Redis URL not configured. Redis features will be disabled.');
+      // Create a dummy client that won't be used
+      this.client = {} as RedisClientType;
+      return;
+    }
+
     this.client = createClient({
       url: config.redis.url,
       password: config.redis.password,
@@ -46,13 +54,18 @@ class RedisClient {
   }
 
   public async connect(): Promise<void> {
+    if (!config.redis.url || config.redis.url === 'redis://localhost:6379') {
+      logger.warn('Skipping Redis connection - not configured');
+      return;
+    }
+
     if (!this.isConnected) {
       try {
         await this.client.connect();
         logger.info('Redis connection established');
       } catch (error) {
-        logger.error('Failed to connect to Redis:', error);
-        throw error;
+        logger.warn('Failed to connect to Redis (non-fatal):', error);
+        // Don't throw - allow server to continue without Redis
       }
     }
   }
@@ -71,6 +84,7 @@ class RedisClient {
 
   // Helper methods
   public async get(key: string): Promise<string | null> {
+    if (!this.isConnected) return null;
     try {
       return await this.client.get(key);
     } catch (error) {
@@ -80,6 +94,7 @@ class RedisClient {
   }
 
   public async set(key: string, value: string, ttl?: number): Promise<void> {
+    if (!this.isConnected) return;
     try {
       if (ttl) {
         await this.client.setEx(key, ttl, value);
@@ -88,20 +103,21 @@ class RedisClient {
       }
     } catch (error) {
       logger.error(`Redis SET error for key ${key}:`, error);
-      throw error;
+      // Don't throw - allow server to continue
     }
   }
 
   public async del(key: string): Promise<void> {
+    if (!this.isConnected) return;
     try {
       await this.client.del(key);
     } catch (error) {
       logger.error(`Redis DEL error for key ${key}:`, error);
-      throw error;
     }
   }
 
   public async exists(key: string): Promise<boolean> {
+    if (!this.isConnected) return false;
     try {
       const result = await this.client.exists(key);
       return result === 1;
@@ -127,6 +143,7 @@ class RedisClient {
   }
 
   public async invalidatePattern(pattern: string): Promise<void> {
+    if (!this.isConnected) return;
     try {
       const keys = await this.client.keys(pattern);
       if (keys.length > 0) {
