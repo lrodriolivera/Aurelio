@@ -215,23 +215,30 @@ BEGIN
 END;
 $$ language 'plpgsql';
 
+DROP TRIGGER IF EXISTS update_users_updated_at ON users;
 CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON users
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_customers_updated_at ON customers;
 CREATE TRIGGER update_customers_updated_at BEFORE UPDATE ON customers
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_orders_updated_at ON orders;
 CREATE TRIGGER update_orders_updated_at BEFORE UPDATE ON orders
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_packages_updated_at ON packages;
 CREATE TRIGGER update_packages_updated_at BEFORE UPDATE ON packages
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_shipments_updated_at ON shipments;
 CREATE TRIGGER update_shipments_updated_at BEFORE UPDATE ON shipments
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_freight_rates_updated_at ON freight_rates;
 CREATE TRIGGER update_freight_rates_updated_at BEFORE UPDATE ON freight_rates
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_insurance_updated_at ON insurance;
 CREATE TRIGGER update_insurance_updated_at BEFORE UPDATE ON insurance
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
