@@ -127,17 +127,9 @@ class ShipmentService {
   }
 
   async getById(id: string): Promise<any> {
+    // First get the shipment
     const result = await database.query(
-      `SELECT
-        s.*,
-        CASE
-          WHEN u.first_name IS NOT NULL AND u.last_name IS NOT NULL
-          THEN u.first_name || ' ' || u.last_name
-          ELSE NULL
-        END as created_by_name
-      FROM shipments s
-      LEFT JOIN users u ON s.created_by = u.id
-      WHERE s.id = $1`,
+      `SELECT * FROM shipments WHERE id = $1`,
       [id]
     );
 
@@ -146,6 +138,19 @@ class ShipmentService {
     }
 
     const shipment = result.rows[0];
+
+    // Get created_by name separately if needed
+    let created_by_name = null;
+    if (shipment.created_by) {
+      const userResult = await database.query(
+        `SELECT first_name, last_name FROM users WHERE id = $1`,
+        [shipment.created_by]
+      );
+      if (userResult.rows.length > 0) {
+        const user = userResult.rows[0];
+        created_by_name = `${user.first_name} ${user.last_name}`;
+      }
+    }
 
     // Get packages in shipment grouped by order
     const packagesResult = await database.query(
@@ -219,6 +224,7 @@ class ShipmentService {
 
     const response: any = {
       ...shipment,
+      created_by_name,
       orders: Array.from(ordersMap.values()),
     };
 
