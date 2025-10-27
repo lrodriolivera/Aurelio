@@ -9,15 +9,15 @@ import ApiError from './ApiError';
 
 export class JwtUtils {
   static generateToken(payload: TokenPayload): string {
-    return jwt.sign(payload, config.jwt.secret, {
-      expiresIn: config.jwt.expiresIn,
-    });
+    return jwt.sign(payload as any, config.jwt.secret as string, {
+      expiresIn: config.jwt.expiresIn as string,
+    } as any);
   }
 
   static generateRefreshToken(payload: TokenPayload): string {
-    return jwt.sign(payload, config.jwt.refreshSecret, {
-      expiresIn: config.jwt.refreshExpiresIn,
-    });
+    return jwt.sign(payload as any, config.jwt.refreshSecret as string, {
+      expiresIn: config.jwt.refreshExpiresIn as string,
+    } as any);
   }
 
   static verifyToken(token: string): TokenPayload {
