@@ -334,6 +334,23 @@ CREATE INDEX idx_tracking_states_order ON tracking_states(order_id, created_at D
 CREATE INDEX idx_tracking_states_state ON tracking_states(state);
 
 -- =========================================
+-- TABLA: package_status_history
+-- Descripción: Historial de estados de bultos (legacy compatibility)
+-- =========================================
+CREATE TABLE IF NOT EXISTS package_status_history (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    package_id UUID NOT NULL REFERENCES packages(id) ON DELETE CASCADE,
+    status VARCHAR(50) NOT NULL,
+    location VARCHAR(100),
+    notes TEXT,
+    changed_by UUID REFERENCES users(id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+CREATE INDEX idx_package_status_history_package ON package_status_history(package_id, created_at DESC);
+CREATE INDEX idx_package_status_history_status ON package_status_history(status);
+
+-- =========================================
 -- TABLA: deliveries
 -- Descripción: Entregas y retiros
 -- =========================================
