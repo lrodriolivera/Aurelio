@@ -161,17 +161,32 @@ class ShipmentService {
         c.rut as customer_rut,
         sp.loaded_at as added_at
       FROM shipment_packages sp
-      JOIN packages p ON sp.package_id = p.id
-      JOIN orders o ON p.order_id = o.id
-      JOIN customers c ON o.customer_id = c.id
+      LEFT JOIN packages p ON sp.package_id = p.id
+      LEFT JOIN orders o ON p.order_id = o.id
+      LEFT JOIN customers c ON o.customer_id = c.id
       WHERE sp.shipment_id = $1
-      ORDER BY o.order_number, p.package_number`,
+      ORDER BY COALESCE(o.order_number, ''), p.package_number`,
       [id]
     );
 
     // Group packages by order
     const ordersMap = new Map();
+    const orphanPackages: any[] = [];
+
     packagesResult.rows.forEach((pkg) => {
+      // If package has no order, add to orphan packages list
+      if (!pkg.order_id) {
+        orphanPackages.push({
+          id: pkg.id,
+          package_number: pkg.package_number,
+          description: pkg.description,
+          weight: pkg.weight,
+          label_printed: pkg.label_printed,
+          current_status: pkg.current_status,
+        });
+        return;
+      }
+
       if (!ordersMap.has(pkg.order_id)) {
         ordersMap.set(pkg.order_id, {
           id: pkg.order_id,
@@ -194,10 +209,17 @@ class ShipmentService {
       });
     });
 
-    return {
+    const response: any = {
       ...shipment,
       orders: Array.from(ordersMap.values()),
     };
+
+    // Include orphan packages if any
+    if (orphanPackages.length > 0) {
+      response.orphan_packages = orphanPackages;
+    }
+
+    return response;
   }
 
   async create(data: CreateShipmentDto, userId: string): Promise<any> {
