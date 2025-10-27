@@ -23,8 +23,8 @@ export default function BarcodeScanner({ onScan, onClose }: Props) {
       const reader = new BrowserMultiFormatReader();
       readerRef.current = reader;
 
-      const devices = await reader.listVideoInputDevices();
-      const backCamera = devices.find(d =>
+      const devices = await (reader as any).listVideoInputDevices();
+      const backCamera = devices.find((d: any) =>
         d.label.toLowerCase().includes('back')
       ) || devices[0];
 
@@ -53,7 +53,7 @@ export default function BarcodeScanner({ onScan, onClose }: Props) {
 
   const stopScan = () => {
     if (readerRef.current) {
-      readerRef.current.reset();
+      (readerRef.current as any).reset?.();
     }
     setScanning(false);
   };

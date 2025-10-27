@@ -5,7 +5,7 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { authStore } from '../store/authStore';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const API_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:3000';
 
 // Create axios instance
 export const api = axios.create({

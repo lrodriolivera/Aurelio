@@ -127,30 +127,36 @@ class ShipmentService {
   }
 
   async getById(id: string): Promise<any> {
-    // First get the shipment
-    const result = await database.query(
-      `SELECT * FROM shipments WHERE id = $1`,
-      [id]
-    );
-
-    if (result.rows.length === 0) {
-      throw ApiError.notFound(`Envío no encontrado con ID: ${id}`);
-    }
-
-    const shipment = result.rows[0];
-
-    // Get created_by name separately if needed
-    let created_by_name = null;
-    if (shipment.created_by) {
-      const userResult = await database.query(
-        `SELECT first_name, last_name FROM users WHERE id = $1`,
-        [shipment.created_by]
+    try {
+      // First get the shipment
+      const result = await database.query(
+        `SELECT * FROM shipments WHERE id = $1`,
+        [id]
       );
-      if (userResult.rows.length > 0) {
-        const user = userResult.rows[0];
-        created_by_name = `${user.first_name} ${user.last_name}`;
+
+      if (result.rows.length === 0) {
+        throw ApiError.notFound(`Envío no encontrado con ID: ${id}`);
       }
-    }
+
+      const shipment = result.rows[0];
+
+      // Get created_by name separately if needed
+      let created_by_name = null;
+      if (shipment.created_by) {
+        try {
+          const userResult = await database.query(
+            `SELECT first_name, last_name FROM users WHERE id = $1`,
+            [shipment.created_by]
+          );
+          if (userResult.rows.length > 0) {
+            const user = userResult.rows[0];
+            created_by_name = `${user.first_name} ${user.last_name}`;
+          }
+        } catch (error) {
+          logger.warn(`Could not fetch user for shipment ${id}: ${error}`);
+          // Continue without user name
+        }
+      }
 
     // Get packages in shipment grouped by order
     const packagesResult = await database.query(
@@ -222,18 +228,22 @@ class ShipmentService {
       });
     });
 
-    const response: any = {
-      ...shipment,
-      created_by_name,
-      orders: Array.from(ordersMap.values()),
-    };
+      const response: any = {
+        ...shipment,
+        created_by_name,
+        orders: Array.from(ordersMap.values()),
+      };
 
-    // Include orphan packages if any
-    if (orphanPackages.length > 0) {
-      response.orphan_packages = orphanPackages;
+      // Include orphan packages if any
+      if (orphanPackages.length > 0) {
+        response.orphan_packages = orphanPackages;
+      }
+
+      return response;
+    } catch (error) {
+      logger.error(`Error in getById for shipment ${id}:`, error);
+      throw error;
     }
-
-    return response;
   }
 
   async create(data: CreateShipmentDto, userId: string): Promise<any> {

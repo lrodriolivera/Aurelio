@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 export const useBarcodeScanner = (onScan: (barcode: string) => void) => {
   useEffect(() => {
     let buffer = '';
-    let timeout: NodeJS.Timeout;
+    let timeout: any;
 
     const handleKeyPress = (e: KeyboardEvent) => {
       clearTimeout(timeout);

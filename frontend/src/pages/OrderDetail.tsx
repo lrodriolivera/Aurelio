@@ -177,7 +177,7 @@ export default function OrderDetail() {
             <div>
               <span className="text-sm text-gray-600">Fecha de Recepción</span>
               <p className="font-medium">
-                {new Date(orderData.reception_date).toLocaleString('es-CL')}
+                {new Date(orderData.created_at).toLocaleString('es-CL')}
               </p>
             </div>
             <div>
