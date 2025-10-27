@@ -169,6 +169,8 @@ class ShipmentService {
         p.width,
         p.height,
         p.current_status,
+        p.label_printed,
+        p.label_printed_at,
         p.created_at,
         o.id as order_id,
         o.order_number,
@@ -176,7 +178,7 @@ class ShipmentService {
         o.total_charge,
         c.business_name as customer_name,
         c.rut as customer_rut,
-        sp.scanned_at as added_at
+        sp.loaded_at as added_at
       FROM shipment_packages sp
       LEFT JOIN packages p ON sp.package_id = p.id
       LEFT JOIN orders o ON p.order_id = o.id
@@ -199,6 +201,7 @@ class ShipmentService {
           description: pkg.description,
           weight: pkg.weight,
           current_status: pkg.current_status,
+          label_printed: pkg.label_printed,
         });
         return;
       }
@@ -221,6 +224,7 @@ class ShipmentService {
         description: pkg.description,
         weight: pkg.weight,
         current_status: pkg.current_status,
+        label_printed: pkg.label_printed,
       });
     });
 
@@ -253,15 +257,15 @@ class ShipmentService {
       // Create shipment
       const shipmentResult = await client.query<Shipment>(
         `INSERT INTO shipments (
-          shipment_number, destination, carrier, vehicle_plate,
-          driver_name, driver_phone, estimated_departure,
+          shipment_number, origin, destination, vehicle_plate,
+          driver_name, driver_phone, scheduled_departure,
           status, notes, created_by
         ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
         RETURNING *`,
         [
           shipmentNumber,
+          'Santiago', // Default origin
           data.destination,
-          data.carrier || null,
           data.vehicle_plate || null,
           data.driver_name || null,
           data.driver_phone || null,
@@ -340,7 +344,7 @@ class ShipmentService {
       // Add all packages to shipment
       for (const pkg of packagesResult.rows) {
         await client.query(
-          `INSERT INTO shipment_packages (shipment_id, package_id, scanned_at, scanned_by)
+          `INSERT INTO shipment_packages (shipment_id, package_id, loaded_at, loaded_by)
            VALUES ($1, $2, NOW(), $3)`,
           [shipmentId, pkg.id, userId]
         );
@@ -417,6 +421,16 @@ class ShipmentService {
       if (packageInShipmentResult.rows.length === 0) {
         throw ApiError.badRequest('Este bulto no pertenece a este envío');
       }
+
+      // Update package as scanned
+      await client.query(
+        `UPDATE packages
+         SET label_printed = true,
+             label_printed_at = NOW(),
+             updated_at = NOW()
+         WHERE id = $1`,
+        [pkg.id]
+      );
 
       // Create package status history
       await client.query(
