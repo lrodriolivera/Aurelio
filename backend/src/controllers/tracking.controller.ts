@@ -41,10 +41,16 @@ export const track = async (req: Request, res: Response) => {
     });
   } catch (error) {
     if (error instanceof ApiError) {
-      throw error;
+      return res.status(error.statusCode).json({
+        success: false,
+        error: error.message,
+      });
     }
     logger.error(`Error tracking: ${error}`);
-    throw ApiError.internal('Error al consultar seguimiento');
+    return res.status(500).json({
+      success: false,
+      error: 'Error al consultar seguimiento',
+    });
   }
 };
 
@@ -63,10 +69,16 @@ export const trackByOrder = async (req: Request, res: Response) => {
     });
   } catch (error) {
     if (error instanceof ApiError) {
-      throw error;
+      return res.status(error.statusCode).json({
+        success: false,
+        error: error.message,
+      });
     }
     logger.error(`Error tracking order: ${error}`);
-    throw ApiError.internal('Error al consultar orden');
+    return res.status(500).json({
+      success: false,
+      error: 'Error al consultar orden',
+    });
   }
 };
 
@@ -85,10 +97,16 @@ export const trackByPackage = async (req: Request, res: Response) => {
     });
   } catch (error) {
     if (error instanceof ApiError) {
-      throw error;
+      return res.status(error.statusCode).json({
+        success: false,
+        error: error.message,
+      });
     }
     logger.error(`Error tracking package: ${error}`);
-    throw ApiError.internal('Error al consultar bulto');
+    return res.status(500).json({
+      success: false,
+      error: 'Error al consultar bulto',
+    });
   }
 };
 
@@ -107,7 +125,10 @@ export const getRecentEvents = async (req: Request, res: Response) => {
     });
   } catch (error) {
     logger.error(`Error getting tracking events: ${error}`);
-    throw ApiError.internal('Error al obtener eventos');
+    return res.status(500).json({
+      success: false,
+      error: 'Error al obtener eventos',
+    });
   }
 };
 
@@ -125,6 +146,9 @@ export const getStats = async (req: Request, res: Response) => {
     });
   } catch (error) {
     logger.error(`Error getting tracking stats: ${error}`);
-    throw ApiError.internal('Error al obtener estadísticas');
+    return res.status(500).json({
+      success: false,
+      error: 'Error al obtener estadísticas',
+    });
   }
 };
