@@ -137,7 +137,7 @@ class ShipmentService {
       JOIN orders o ON p.order_id = o.id
       JOIN customers c ON o.customer_id = c.id
       WHERE sp.shipment_id = $1
-      ORDER BY o.order_number, p.sequence_number`,
+      ORDER BY o.order_number, p.package_number`,
       [id]
     );
 
@@ -159,7 +159,6 @@ class ShipmentService {
       ordersMap.get(pkg.order_id).packages.push({
         id: pkg.id,
         package_number: pkg.package_number,
-        sequence_number: pkg.sequence_number,
         description: pkg.description,
         weight: pkg.weight,
         label_printed: pkg.label_printed,

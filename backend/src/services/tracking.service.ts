@@ -19,7 +19,6 @@ interface TrackingState {
 interface PackageTracking {
   package_id: string;
   package_number: string;
-  sequence_number: number;
   description: string;
   weight: number;
   current_status: string;
@@ -85,7 +84,7 @@ class TrackingService {
         label_printed
       FROM packages
       WHERE order_id = $1
-      ORDER BY sequence_number`,
+      ORDER BY package_number`,
       [order.order_id]
     );
 
@@ -134,7 +133,6 @@ class TrackingService {
       `SELECT
         p.id as package_id,
         p.package_number,
-        p.sequence_number,
         p.description,
         p.weight,
         p.current_status,
@@ -210,7 +208,7 @@ class TrackingService {
         label_printed
       FROM packages
       WHERE order_id = $1
-      ORDER BY sequence_number`,
+      ORDER BY package_number`,
       [pkg.order_id]
     );
 

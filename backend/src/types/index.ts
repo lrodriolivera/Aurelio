@@ -147,19 +147,14 @@ export interface Package {
   id: string;
   order_id: string;
   package_number: string;
-  sequence_number: number;
   description?: string;
   weight: number;
   length?: number;
   width?: number;
   height?: number;
-  volume?: number;
-  qr_code?: string;
-  barcode?: string;
   current_status: PackageStatus;
   label_printed: boolean;
   label_printed_at?: Date;
-  notes?: string;
   created_at: Date;
   updated_at: Date;
 }

@@ -103,7 +103,7 @@ class OrderService {
 
     // Get packages
     const packagesResult = await database.query<Package>(
-      'SELECT * FROM packages WHERE order_id = $1 ORDER BY sequence_number',
+      'SELECT * FROM packages WHERE order_id = $1 ORDER BY package_number',
       [id]
     );
 
