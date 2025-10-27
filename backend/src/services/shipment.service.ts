@@ -62,7 +62,11 @@ class ShipmentService {
         s.created_at,
         s.updated_at,
         COUNT(DISTINCT o.id) as total_orders,
-        u.first_name || ' ' || u.last_name as created_by_name
+        CASE
+          WHEN u.first_name IS NOT NULL AND u.last_name IS NOT NULL
+          THEN u.first_name || ' ' || u.last_name
+          ELSE NULL
+        END as created_by_name
       FROM shipments s
       LEFT JOIN shipment_packages sp ON s.id = sp.shipment_id
       LEFT JOIN packages p ON sp.package_id = p.id
@@ -126,7 +130,11 @@ class ShipmentService {
     const result = await database.query(
       `SELECT
         s.*,
-        u.first_name || ' ' || u.last_name as created_by_name
+        CASE
+          WHEN u.first_name IS NOT NULL AND u.last_name IS NOT NULL
+          THEN u.first_name || ' ' || u.last_name
+          ELSE NULL
+        END as created_by_name
       FROM shipments s
       LEFT JOIN users u ON s.created_by = u.id
       WHERE s.id = $1`,
@@ -134,7 +142,7 @@ class ShipmentService {
     );
 
     if (result.rows.length === 0) {
-      throw ApiError.notFound('Envío no encontrado');
+      throw ApiError.notFound(`Envío no encontrado con ID: ${id}`);
     }
 
     const shipment = result.rows[0];
