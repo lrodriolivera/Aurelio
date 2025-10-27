@@ -5,7 +5,7 @@
   "main": "dist/server.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "build": "tsc",
+    "build": "tsc -p tsconfig.prod.json",
     "start": "node dist/server.js",
     "migrate": "node database/migrate.js",
     "test": "jest",

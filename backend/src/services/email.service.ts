@@ -47,7 +47,7 @@ class EmailService {
   private async initialize(): Promise<void> {
     try {
       if (config.email.host && config.email.user) {
-        this.transporter = nodemailer.createTransporter({
+        this.transporter = nodemailer.createTransport({
           host: config.email.host,
           port: config.email.port || 587,
           secure: config.email.port === 465,

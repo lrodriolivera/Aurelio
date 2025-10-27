@@ -9,7 +9,6 @@ import logger from '../utils/logger';
 import QRCodeUtils from '../utils/qrcode';
 import {
   Shipment,
-  ShipmentOrder,
   Package,
   QueryParams,
   PaginatedResponse,
