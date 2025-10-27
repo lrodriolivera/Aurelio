@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "tsc -p tsconfig.prod.json",
-    "start": "node database/migrate-fresh.js && node dist/server.js",
-    "start:fresh": "node database/migrate-fresh.js && node dist/server.js",
+    "start": "npm run build && node database/migrate-fresh.js && node dist/server.js",
+    "start:fresh": "npm run build && node database/migrate-fresh.js && node dist/server.js",
     "migrate": "node database/migrate.js",
     "migrate:fresh": "node database/migrate-fresh.js",
     "test": "jest",
@@ -45,6 +45,7 @@
     "redis": "^4.6.12",
     "serialport": "^13.0.0",
     "socket.io": "^4.6.1",
+    "typescript": "^5.3.3",
     "uuid": "^9.0.1",
     "winston": "^3.11.0",
     "zod": "^3.22.4"
