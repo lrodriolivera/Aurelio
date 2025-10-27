@@ -196,9 +196,8 @@ class OrderService {
         const pkgResult = await client.query<Package>(
           `INSERT INTO packages (
             order_id, package_number, sequence_number, description, weight,
-            length, width, height, volume, qr_code, barcode,
-            current_status, current_location, notes
-          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+            length, width, height, current_status
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
           RETURNING *`,
           [
             order.id,
@@ -209,24 +208,18 @@ class OrderService {
             pkgData.length || null,
             pkgData.width || null,
             pkgData.height || null,
-            volume,
-            pkgQrCode,
-            packageNumber, // Use package number as barcode
             'RECIBIDO',
-            data.origin || 'Santiago',
-            pkgData.notes || null,
           ]
         );
 
         packages.push(pkgResult.rows[0]);
 
-        // Create initial tracking state
+        // Create initial package status history
         await client.query(
-          `INSERT INTO tracking_states (package_id, order_id, state, location, description, changed_by)
-           VALUES ($1, $2, $3, $4, $5, $6)`,
+          `INSERT INTO package_status_history (package_id, status, location, notes, changed_by)
+           VALUES ($1, $2, $3, $4, $5)`,
           [
             pkgResult.rows[0].id,
-            order.id,
             'RECIBIDO',
             data.origin || 'Santiago',
             'Carga recibida en bodega de origen',

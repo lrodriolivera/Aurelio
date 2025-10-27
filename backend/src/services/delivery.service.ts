@@ -46,7 +46,6 @@ class DeliveryService {
         p.description,
         p.weight,
         p.current_status,
-        p.current_location,
         o.id as order_id,
         o.order_number,
         o.destination,
@@ -138,21 +137,19 @@ class DeliveryService {
         [data.package_id]
       );
 
-      // Create tracking state
+      // Create package status history
       await client.query(
-        `INSERT INTO tracking_states (
+        `INSERT INTO package_status_history (
           package_id,
-          order_id,
-          state,
+          status,
           location,
-          description,
+          notes,
           changed_by
-        ) VALUES ($1, $2, $3, $4, $5, $6)`,
+        ) VALUES ($1, $2, $3, $4, $5)`,
         [
           data.package_id,
-          pkg.order_id,
           'ENTREGADO',
-          data.delivery_city || pkg.current_location,
+          data.delivery_city || 'Destino',
           data.delivery_type === 'ENTREGA_DOMICILIO'
             ? `Entregado a domicilio - ${data.recipient_name}`
             : `Retirado en sucursal - ${data.recipient_name}`,

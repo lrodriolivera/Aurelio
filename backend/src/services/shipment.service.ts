@@ -164,7 +164,6 @@ class ShipmentService {
         weight: pkg.weight,
         label_printed: pkg.label_printed,
         current_status: pkg.current_status,
-        current_location: pkg.current_location,
       });
     });
 
@@ -355,19 +354,17 @@ class ShipmentService {
         `UPDATE packages
          SET label_printed = true,
              label_printed_at = NOW(),
-             current_location = $1,
              updated_at = NOW()
-         WHERE id = $2`,
-        [data.location, pkg.id]
+         WHERE id = $1`,
+        [pkg.id]
       );
 
-      // Create tracking state
+      // Create package status history
       await client.query(
-        `INSERT INTO tracking_states (package_id, order_id, state, location, description, changed_by)
-         VALUES ($1, $2, $3, $4, $5, $6)`,
+        `INSERT INTO package_status_history (package_id, status, location, notes, changed_by)
+         VALUES ($1, $2, $3, $4, $5)`,
         [
           pkg.id,
-          pkg.order_id,
           'EN_BODEGA_ORIGEN',
           data.location,
           'Bulto escaneado y agregado al envío',
@@ -436,14 +433,13 @@ class ShipmentService {
           [order.id]
         );
 
-        // Create tracking states for all packages
+        // Create package status history for all packages
         for (const pkg of order.packages) {
           await client.query(
-            `INSERT INTO tracking_states (package_id, order_id, state, location, description, changed_by)
-             VALUES ($1, $2, $3, $4, $5, $6)`,
+            `INSERT INTO package_status_history (package_id, status, location, notes, changed_by)
+             VALUES ($1, $2, $3, $4, $5)`,
             [
               pkg.id,
-              order.id,
               'EN_TRANSITO_PUERTO',
               shipment.destination,
               `En tránsito hacia ${shipment.destination}`,

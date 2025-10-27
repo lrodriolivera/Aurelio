@@ -9,10 +9,10 @@ import logger from '../utils/logger';
 
 interface TrackingState {
   id: string;
-  state: string;
+  status: string;
   location: string;
-  description: string;
-  changed_at: Date;
+  notes: string;
+  created_at: Date;
   changed_by_name?: string;
 }
 
@@ -23,7 +23,6 @@ interface PackageTracking {
   description: string;
   weight: number;
   current_status: string;
-  current_location: string;
   label_printed: boolean;
   states: TrackingState[];
 }
@@ -83,7 +82,6 @@ class TrackingService {
         description,
         weight,
         current_status,
-        current_location,
         label_printed
       FROM packages
       WHERE order_id = $1
@@ -96,16 +94,16 @@ class TrackingService {
       packagesResult.rows.map(async (pkg) => {
         const statesResult = await database.query(
           `SELECT
-            ts.id,
-            ts.state,
-            ts.location,
-            ts.description,
-            ts.changed_at,
+            psh.id,
+            psh.status,
+            psh.location,
+            psh.notes,
+            psh.created_at,
             u.first_name || ' ' || u.last_name as changed_by_name
-          FROM tracking_states ts
-          LEFT JOIN users u ON ts.changed_by = u.id
-          WHERE ts.package_id = $1
-          ORDER BY ts.changed_at DESC`,
+          FROM package_status_history psh
+          LEFT JOIN users u ON psh.changed_by = u.id
+          WHERE psh.package_id = $1
+          ORDER BY psh.created_at DESC`,
           [pkg.package_id]
         );
 
@@ -140,7 +138,6 @@ class TrackingService {
         p.description,
         p.weight,
         p.current_status,
-        p.current_location,
         p.label_printed,
         p.order_id
       FROM packages p
@@ -157,16 +154,16 @@ class TrackingService {
     // Get tracking states for this package
     const statesResult = await database.query(
       `SELECT
-        ts.id,
-        ts.state,
-        ts.location,
-        ts.description,
-        ts.changed_at,
+        psh.id,
+        psh.status,
+        psh.location,
+        psh.notes,
+        psh.created_at,
         u.first_name || ' ' || u.last_name as changed_by_name
-      FROM tracking_states ts
-      LEFT JOIN users u ON ts.changed_by = u.id
-      WHERE ts.package_id = $1
-      ORDER BY ts.changed_at DESC`,
+      FROM package_status_history psh
+      LEFT JOIN users u ON psh.changed_by = u.id
+      WHERE psh.package_id = $1
+      ORDER BY psh.created_at DESC`,
       [pkg.package_id]
     );
 
@@ -210,7 +207,6 @@ class TrackingService {
         description,
         weight,
         current_status,
-        current_location,
         label_printed
       FROM packages
       WHERE order_id = $1
@@ -222,16 +218,16 @@ class TrackingService {
       allPackagesResult.rows.map(async (p) => {
         const states = await database.query(
           `SELECT
-            ts.id,
-            ts.state,
-            ts.location,
-            ts.description,
-            ts.changed_at,
+            psh.id,
+            psh.status,
+            psh.location,
+            psh.notes,
+            psh.created_at,
             u.first_name || ' ' || u.last_name as changed_by_name
-          FROM tracking_states ts
-          LEFT JOIN users u ON ts.changed_by = u.id
-          WHERE ts.package_id = $1
-          ORDER BY ts.changed_at DESC`,
+          FROM package_status_history psh
+          LEFT JOIN users u ON psh.changed_by = u.id
+          WHERE psh.package_id = $1
+          ORDER BY psh.created_at DESC`,
           [p.package_id]
         );
 
@@ -259,21 +255,21 @@ class TrackingService {
   async getRecentEvents(limit: number = 50): Promise<any[]> {
     const result = await database.query(
       `SELECT
-        ts.id,
-        ts.state,
-        ts.location,
-        ts.description,
-        ts.changed_at,
+        psh.id,
+        psh.status,
+        psh.location,
+        psh.notes,
+        psh.created_at,
         p.package_number,
         o.order_number,
         c.business_name as customer_name,
         u.first_name || ' ' || u.last_name as changed_by_name
-      FROM tracking_states ts
-      JOIN packages p ON ts.package_id = p.id
-      JOIN orders o ON ts.order_id = o.id
+      FROM package_status_history psh
+      JOIN packages p ON psh.package_id = p.id
+      JOIN orders o ON p.order_id = o.id
       JOIN customers c ON o.customer_id = c.id
-      LEFT JOIN users u ON ts.changed_by = u.id
-      ORDER BY ts.changed_at DESC
+      LEFT JOIN users u ON psh.changed_by = u.id
+      ORDER BY psh.created_at DESC
       LIMIT $1`,
       [limit]
     );
@@ -290,27 +286,27 @@ class TrackingService {
     by_state: Record<string, number>;
   }> {
     const totalResult = await database.query(
-      'SELECT COUNT(*) as total FROM tracking_states'
+      'SELECT COUNT(*) as total FROM package_status_history'
     );
     const total_events = parseInt(totalResult.rows[0].total);
 
     const todayResult = await database.query(
       `SELECT COUNT(*) as today
-       FROM tracking_states
-       WHERE DATE(changed_at) = CURRENT_DATE`
+       FROM package_status_history
+       WHERE DATE(created_at) = CURRENT_DATE`
     );
     const today_events = parseInt(todayResult.rows[0].today);
 
     const stateResult = await database.query(`
-      SELECT state, COUNT(*) as count
-      FROM tracking_states
-      WHERE DATE(changed_at) = CURRENT_DATE
-      GROUP BY state
+      SELECT status, COUNT(*) as count
+      FROM package_status_history
+      WHERE DATE(created_at) = CURRENT_DATE
+      GROUP BY status
     `);
 
     const by_state: Record<string, number> = {};
     stateResult.rows.forEach((row) => {
-      by_state[row.state] = parseInt(row.count);
+      by_state[row.status] = parseInt(row.count);
     });
 
     return { total_events, today_events, by_state };

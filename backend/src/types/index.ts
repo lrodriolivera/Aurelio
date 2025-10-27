@@ -157,7 +157,6 @@ export interface Package {
   qr_code?: string;
   barcode?: string;
   current_status: PackageStatus;
-  current_location?: string;
   label_printed: boolean;
   label_printed_at?: Date;
   notes?: string;
@@ -253,7 +252,6 @@ export interface PublicTrackingInfo {
   origin: string;
   destination: string;
   current_status: PackageStatus;
-  current_location?: string;
   estimated_arrival?: Date;
   history: Array<{
     state: PackageStatus;
