@@ -42,11 +42,26 @@ class ShipmentService {
 
     let query = `
       SELECT
-        s.*,
+        s.id,
+        s.shipment_number,
+        s.destination,
+        s.carrier,
+        s.vehicle_plate,
+        s.driver_name,
+        s.driver_phone,
+        s.status,
+        s.total_packages,
+        s.scanned_packages,
+        s.total_weight,
+        s.estimated_departure,
+        s.actual_departure,
+        s.estimated_arrival,
+        s.actual_arrival,
+        s.notes,
+        s.created_by,
+        s.created_at,
+        s.updated_at,
         COUNT(DISTINCT o.id) as total_orders,
-        COUNT(DISTINCT sp.package_id) as total_packages,
-        COUNT(DISTINCT CASE WHEN p.label_printed = true THEN p.id END) as scanned_packages,
-        SUM(p.weight) as total_weight,
         u.first_name || ' ' || u.last_name as created_by_name
       FROM shipments s
       LEFT JOIN shipment_packages sp ON s.id = sp.shipment_id
@@ -73,8 +88,11 @@ class ShipmentService {
       queryParams.push(params.filters.status);
     }
 
-    // Add GROUP BY
-    query += ` GROUP BY s.id, u.id`;
+    // Add GROUP BY with all non-aggregated columns
+    query += ` GROUP BY s.id, s.shipment_number, s.destination, s.carrier, s.vehicle_plate,
+               s.driver_name, s.driver_phone, s.status, s.total_packages, s.scanned_packages,
+               s.total_weight, s.estimated_departure, s.actual_departure, s.estimated_arrival,
+               s.actual_arrival, s.notes, s.created_by, s.created_at, s.updated_at, u.first_name, u.last_name`;
 
     // Count total
     const countQuery = `
