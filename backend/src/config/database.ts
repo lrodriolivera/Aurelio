@@ -13,11 +13,7 @@ class Database {
 
   private constructor() {
     this.pool = new Pool({
-      host: config.database.host,
-      port: config.database.port,
-      database: config.database.name,
-      user: config.database.user,
-      password: config.database.password,
+      connectionString: config.database.url,
       max: config.database.pool.max,
       min: config.database.pool.min,
       idleTimeoutMillis: 30000,
