@@ -4,6 +4,7 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "strictNullChecks": false,
+    "strictPropertyInitialization": false,
     "noImplicitReturns": false,
     "declaration": false,
     "declarationMap": false,
