@@ -44,16 +44,16 @@ class ShipmentService {
       SELECT
         s.id,
         s.shipment_number,
+        s.origin,
         s.destination,
-        s.carrier,
         s.vehicle_plate,
         s.driver_name,
         s.driver_phone,
         s.status,
         s.total_packages,
-        s.scanned_packages,
         s.total_weight,
-        s.estimated_departure,
+        s.total_value,
+        s.scheduled_departure,
         s.actual_departure,
         s.estimated_arrival,
         s.actual_arrival,
@@ -93,9 +93,9 @@ class ShipmentService {
     }
 
     // Add GROUP BY with all non-aggregated columns
-    query += ` GROUP BY s.id, s.shipment_number, s.destination, s.carrier, s.vehicle_plate,
-               s.driver_name, s.driver_phone, s.status, s.total_packages, s.scanned_packages,
-               s.total_weight, s.estimated_departure, s.actual_departure, s.estimated_arrival,
+    query += ` GROUP BY s.id, s.shipment_number, s.origin, s.destination, s.vehicle_plate,
+               s.driver_name, s.driver_phone, s.status, s.total_packages, s.total_weight, s.total_value,
+               s.scheduled_departure, s.actual_departure, s.estimated_arrival,
                s.actual_arrival, s.notes, s.created_by, s.created_at, s.updated_at, u.first_name, u.last_name`;
 
     // Count total

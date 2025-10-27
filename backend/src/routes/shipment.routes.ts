@@ -16,7 +16,7 @@ router.get('/health', (req, res) => {
   res.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
-    version: '2025-01-27-v8-migrated-fresh'
+    version: '2025-01-27-v9-full-schema-working'
   });
 });
 
