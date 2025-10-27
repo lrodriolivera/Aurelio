@@ -159,7 +159,7 @@ class ShipmentService {
         o.total_charge,
         c.business_name as customer_name,
         c.rut as customer_rut,
-        sp.loaded_at as added_at
+        sp.scanned_at as added_at
       FROM shipment_packages sp
       LEFT JOIN packages p ON sp.package_id = p.id
       LEFT JOIN orders o ON p.order_id = o.id
@@ -233,15 +233,15 @@ class ShipmentService {
       // Create shipment
       const shipmentResult = await client.query<Shipment>(
         `INSERT INTO shipments (
-          shipment_number, origin, destination, vehicle_plate,
-          driver_name, driver_phone, scheduled_departure,
+          shipment_number, destination, carrier, vehicle_plate,
+          driver_name, driver_phone, estimated_departure,
           status, notes, created_by
         ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
         RETURNING *`,
         [
           shipmentNumber,
-          'Santiago', // Default origin
           data.destination,
+          data.carrier || null,
           data.vehicle_plate || null,
           data.driver_name || null,
           data.driver_phone || null,
@@ -320,7 +320,7 @@ class ShipmentService {
       // Add all packages to shipment
       for (const pkg of packagesResult.rows) {
         await client.query(
-          `INSERT INTO shipment_packages (shipment_id, package_id, loaded_at, loaded_by)
+          `INSERT INTO shipment_packages (shipment_id, package_id, scanned_at, scanned_by)
            VALUES ($1, $2, NOW(), $3)`,
           [shipmentId, pkg.id, userId]
         );
