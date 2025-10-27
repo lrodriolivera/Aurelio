@@ -169,8 +169,6 @@ class ShipmentService {
         p.width,
         p.height,
         p.current_status,
-        p.label_printed,
-        p.label_printed_at,
         p.created_at,
         o.id as order_id,
         o.order_number,
@@ -200,7 +198,6 @@ class ShipmentService {
           package_number: pkg.package_number,
           description: pkg.description,
           weight: pkg.weight,
-          label_printed: pkg.label_printed,
           current_status: pkg.current_status,
         });
         return;
@@ -223,7 +220,6 @@ class ShipmentService {
         package_number: pkg.package_number,
         description: pkg.description,
         weight: pkg.weight,
-        label_printed: pkg.label_printed,
         current_status: pkg.current_status,
       });
     });
@@ -421,16 +417,6 @@ class ShipmentService {
       if (packageInShipmentResult.rows.length === 0) {
         throw ApiError.badRequest('Este bulto no pertenece a este envío');
       }
-
-      // Update package as scanned
-      await client.query(
-        `UPDATE packages
-         SET label_printed = true,
-             label_printed_at = NOW(),
-             updated_at = NOW()
-         WHERE id = $1`,
-        [pkg.id]
-      );
 
       // Create package status history
       await client.query(
